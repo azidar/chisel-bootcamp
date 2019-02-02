@@ -1,4 +1,3 @@
 openjdk-8-jre-headless
 graphviz
 dpkg
-apt-get
