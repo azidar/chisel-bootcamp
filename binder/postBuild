@@ -23,8 +23,6 @@ mkdir -p ~/.jupyter/custom
 cp source/custom.js ~/.jupyter/custom/custom.js
 
 # Try to publish visualizer
-brew install sbt
-
 git clone https://github.com/azidar/visualizer.git
 cd visualizer
 sbt publishLocal
