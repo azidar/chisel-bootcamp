@@ -10,6 +10,7 @@ tar -xvzf sbt-0.13.11.tgz
 git clone https://github.com/azidar/visualizer.git
 cd visualizer
 ../sbt/bin/sbt publishLocal
+cd ../
 
 # Install coursier
 curl -L -o coursier https://git.io/coursier
