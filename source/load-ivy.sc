@@ -92,6 +92,7 @@ def visualize(gen: () => chisel3.experimental.RawModule): Unit = {
     import chisel3._
     import chisel3.experimental._
     import firrtl.ir.Module
+    import sys.process._
     
     val targetDir = "build"
     val chiselIR = chisel3.Driver.elaborate(gen)
@@ -108,8 +109,13 @@ def visualize(gen: () => chisel3.experimental.RawModule): Unit = {
     }
 
     val ast = Parser.parse(sourceFirrtl)
-    val newTop = ast.main + ast.hashCode().toHexString
-
+    val uniqueTop = ast.main + ast.hashCode().toHexString
+    val cmdRegex = "cmd[0-9]+([A-Za-z]+.*)".r
+    val readableTop = ast.main match {
+      case cmdRegex(n) => n
+      case other => other
+    }
+    val newTop = readableTop
     
     val newModules: Seq[firrtl.ir.DefModule] = ast.modules.map {
         case m: Module if m.name == ast.main => m.copy(name = newTop)
@@ -136,12 +142,15 @@ def visualize(gen: () => chisel3.experimental.RawModule): Unit = {
       x.execute(circuitState)
     }
 
-    val name = newAst.main
-    val moduleView = targetDir + "/" + name + ".dot.svg"
-    val instanceView = targetDir + "/" + name + "_hierarchy.dot.svg"
+    s"cp build/${readableTop}.dot.svg build/${uniqueTop}.dot.svg"!!
+    
+    val moduleView = targetDir + "/" + uniqueTop + ".dot.svg"
     val x = """<a name="top"></a><img src=" """ + moduleView + """" alt="Module View";" />"""
-    val y = """<a name="top"></a><img src=" """ + instanceView + """" alt="Hierarchy View" style="width:480px;" />"""
-    //html(y)
     html(x)
+    
+    //val instanceView = targetDir + "/" + uniqueName + "_hierarchy.dot.svg"
+    //val y = """<a name="top"></a><img src=" """ + instanceView + """" alt="Hierarchy View" style="width:480px;" />"""
+    //html(y)
+
 }
 
