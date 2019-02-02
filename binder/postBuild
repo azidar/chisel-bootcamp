@@ -4,6 +4,7 @@ SCALA_VERSION=2.11.12 ALMOND_VERSION=0.1.9
 
 ## Get sbt like an idiot
 curl -L -o sbt-0.13.11.tgz https://piccolo.link/sbt-0.13.11.tgz
+
 tar -xvzf sbt-0.13.11.tgz
 
 # Try to publish visualizer
