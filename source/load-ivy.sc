@@ -2,6 +2,7 @@ import $ivy.`edu.berkeley.cs::chisel3:3.1.0`
 import $ivy.`edu.berkeley.cs::chisel-iotesters:1.2.0`
 import $ivy.`edu.berkeley.cs::dsptools:1.1.0`
 import $ivy.`org.scalanlp::breeze:0.13.2`
+import $ivy.`edu.berkeley.cs::firrtl-diagrammer:1.0-SNAPSHOT`
 
 // Convenience function to invoke Chisel and grab emitted Verilog.
 def getVerilog(dut: => chisel3.core.UserModule): String = {
@@ -73,5 +74,74 @@ def stringifyAST(firrtlAST: firrtl.ir.Circuit): String = {
     }
   }
   buf.toString
+}
+
+
+
+def visualize(gen: () => chisel3.experimental.RawModule): Unit = {
+    import dotvisualizer._
+    import dotvisualizer.transforms._
+
+    import java.io._
+    import firrtl._
+    import firrtl.annotations._
+
+    import almond.interpreter.api.DisplayData
+    import almond.api.helpers.Display
+
+    import chisel3._
+    import chisel3.experimental._
+    import firrtl.ir.Module
+    
+    val targetDir = "build"
+    val chiselIR = chisel3.Driver.elaborate(gen)
+    val firrtlIR = chisel3.Driver.emit(chiselIR)
+    val config = Config(targetDir = "build", firrtlSource = firrtlIR)
+  
+    val sourceFirrtl = {
+      if(config.firrtlSource.nonEmpty) {
+        config.firrtlSource
+      }
+      else {
+        scala.io.Source.fromFile(config.firrtlSourceFile).getLines().mkString("\n")
+      }
+    }
+
+    val ast = Parser.parse(sourceFirrtl)
+    val newTop = ast.main + ast.hashCode().toHexString
+
+    
+    val newModules: Seq[firrtl.ir.DefModule] = ast.modules.map {
+        case m: Module if m.name == ast.main => m.copy(name = newTop)
+        case other => other
+    }
+    
+    val newAst = ast.copy(main = newTop, modules = newModules)
+    
+    val controlAnnotations: Seq[Annotation] = config.toAnnotations
+
+    val loweredAst = ToLoFirrtl.lower(newAst)
+
+    FileUtils.makeDirectory(targetDir)
+
+    FirrtlDiagrammer.addCss(targetDir)
+
+    val circuitState = CircuitState(loweredAst, LowForm, controlAnnotations)
+
+    if(config.justTopLevel) {
+      val justTopLevelTransform = new ModuleLevelDiagrammer
+      justTopLevelTransform.execute(circuitState)
+    } else {
+      val x = new MakeDiagramGroup
+      x.execute(circuitState)
+    }
+
+    val name = newAst.main
+    val moduleView = targetDir + "/" + name + ".dot.svg"
+    val instanceView = targetDir + "/" + name + "_hierarchy.dot.svg"
+    val x = """<a name="top"></a><img src=" """ + moduleView + """" alt="Module View";" />"""
+    val y = """<a name="top"></a><img src=" """ + instanceView + """" alt="Hierarchy View" style="width:480px;" />"""
+    //html(y)
+    html(x)
 }
 
