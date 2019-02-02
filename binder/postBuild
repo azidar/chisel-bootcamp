@@ -3,8 +3,8 @@
 SCALA_VERSION=2.11.12 ALMOND_VERSION=0.1.9
 
 ## Get sbt like an idiot
-curl -L -o sbt.zip https://piccolo.link/sbt-0.13.17.zip
-tar -xvzf sbt.zip
+curl -L -o sbt.tgz https://piccolo.link/sbt-0.13.17.tgz
+tar -xzf sbt.tgz
 
 # Try to publish visualizer
 git clone https://github.com/azidar/visualizer.git
