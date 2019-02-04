@@ -145,11 +145,11 @@ def visualize(gen: () => chisel3.experimental.RawModule): Unit = {
     s"cp build/${readableTop}.dot.svg build/${uniqueTop}.dot.svg"!!
     
     val moduleView = targetDir + "/" + uniqueTop + ".dot.svg"
-    val x = """<a name="top"></a><img src=" """ + moduleView + """" alt="Module View";" />"""
+    val x = """<a name="top"></a><img src="""" + moduleView + """" alt="Module View";" />"""
     html(x)
     
     //val instanceView = targetDir + "/" + uniqueName + "_hierarchy.dot.svg"
-    //val y = """<a name="top"></a><img src=" """ + instanceView + """" alt="Hierarchy View" style="width:480px;" />"""
+    //val y = """<a name="top"></a><img src="""" + instanceView + """" alt="Hierarchy View" style="width:480px;" />"""
     //html(y)
 
 }
