@@ -110,7 +110,7 @@ def visualize(gen: () => chisel3.experimental.RawModule): Unit = {
 
     val ast = Parser.parse(sourceFirrtl)
     val uniqueTop = ast.main + ast.hashCode().toHexString
-    val cmdRegex = "cmd[0-9]+([A-Za-z]+.*)".r
+    val cmdRegex = "cmd[0-9]+Helper([A-Za-z]+.*)".r
     val readableTop = ast.main match {
       case cmdRegex(n) => n
       case other => other
