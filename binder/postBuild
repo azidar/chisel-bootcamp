@@ -3,7 +3,7 @@
 SCALA_VERSION=2.11.12 ALMOND_VERSION=0.1.9
 
 ## Get rsvg convert
-apt-get install rsvg-convert
+apt-get install librsvg
 
 ## Get sbt like an idiot
 curl -L -o sbt.tgz https://piccolo.link/sbt-0.13.17.tgz
